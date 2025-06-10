@@ -1,5 +1,5 @@
 // === BudgetTracker.pde ===
-
+import g4p_controls.*; 
 ArrayList<Transaction> transactions;
 String categoryInput = "";
 String amountInput = "";
@@ -7,7 +7,8 @@ boolean isIncome = true;
 boolean typingCategory = true;
 
 void setup() {
-  size(800, 600);
+  size(800, 800);
+  createGUI();
   textFont(createFont("Arial", 16));
   transactions = new ArrayList<Transaction>();
   loadTransactions();
@@ -15,44 +16,8 @@ void setup() {
 
 void draw() {
   background(250);
-  drawUI();
 }
 
-void drawUI() {
-  drawInputFields();
-  drawButtons();
-  drawSummary();
-  drawTransactions();
-  drawPieChart();
-}
-
-void drawInputFields() {
-  fill(0);
-  text("Category:", 40, 40);
-  rect(150, 20, 200, 30);
-  fill(typingCategory ? color(0) : color(100));
-  text(categoryInput, 160, 40);
-
-  fill(0);
-  text("Amount ($):", 40, 90);
-  rect(150, 70, 200, 30);
-  fill(typingCategory ? color(100) : color(0));
-  text(amountInput, 160, 90);
-}
-
-void drawButtons() {
-  drawButton(40, 130, 150, 35, isIncome ? "Type: Income" : "Type: Expense");
-  drawButton(200, 130, 80, 35, "Add");
-  drawButton(300, 130, 80, 35, "Save");
-  drawButton(400, 130, 120, 35, "Sort by Amount");
-}
-
-void drawButton(int x, int y, int w, int h, String label) {
-  fill(220);
-  rect(x, y, w, h, 8);
-  fill(0);
-  text(label, x + 10, y + 22);
-}
 
 void mousePressed() {
   if (overRect(40, 130, 150, 35)) isIncome = !isIncome;

@@ -1,49 +1,54 @@
-// === SaveAndSort.pde ===
+// === SummaryAndDisplay.pde ===
 
-void saveTransactions() {
-  String[] lines = new String[transactions.size()];
-  for (int i = 0; i < transactions.size(); i++) {
-    lines[i] = transactions.get(i).toFileString();
+void drawSummary() {
+  float income = 0, expense = 0;
+  for (Transaction t : transactions) {
+    if (t.isIncome) income += t.amount;
+    else expense += t.amount;
   }
-  saveStrings("transactions.txt", lines);
-  println("Saved " + lines.length + " transactions.");
+  float balance = income - expense;
+  fill(0);
+  text("Income: $" + nf(income, 0, 2), 550, 40);
+  text("Expense: $" + nf(expense, 0, 2), 550, 70);
+  fill(balance >= 0 ? color(0, 150, 0) : color(200, 0, 0));
+  text("Balance: $" + nf(balance, 0, 2), 550, 100);
 }
 
-void loadTransactions() {
-  try {
-    String[] lines = loadStrings("transactions.txt");
-    for (String line : lines) {
-      Transaction t = Transaction.fromFileString(line);
-      if (t != null) transactions.add(t);
-    }
-  } catch (Exception e) {
-    println("No transactions file found.");
+void drawTransactions() {
+  fill(0);
+  text("Recent Transactions:", 40, 200);
+  int y = 230;
+  for (int i = max(0, transactions.size() - 10); i < transactions.size(); i++) {
+    Transaction t = transactions.get(i);
+    text(t.toString(), 60, y);
+    y += 22;
   }
 }
 
-void sortTransactionsByAmount() {
-  mergeSort(transactions);
-}
-
-void mergeSort(ArrayList<Transaction> list) {
-  if (list.size() <= 1) return;
-  int mid = list.size() / 2;
-  ArrayList<Transaction> left = new ArrayList<Transaction>(list.subList(0, mid));
-  ArrayList<Transaction> right = new ArrayList<Transaction>(list.subList(mid, list.size()));
-  mergeSort(left);
-  mergeSort(right);
-  merge(list, left, right);
-}
-
-void merge(ArrayList<Transaction> list, ArrayList<Transaction> left, ArrayList<Transaction> right) {
-  int i = 0, j = 0, k = 0;
-  while (i < left.size() && j < right.size()) {
-    if (left.get(i).amount < right.get(j).amount) {
-      list.set(k++, left.get(i++));
-    } else {
-      list.set(k++, right.get(j++));
+void drawPieChart() {
+  float total = 0;
+  HashMap<String, Float> categoryTotals = new HashMap<String, Float>();
+  for (Transaction t : transactions) {
+    if (!t.isIncome) {
+      total += t.amount;
+      if (!categoryTotals.containsKey(t.category)) categoryTotals.put(t.category, 0.0);
+      categoryTotals.put(t.category, categoryTotals.get(t.category) + t.amount);
     }
   }
-  while (i < left.size()) list.set(k++, left.get(i++));
-  while (j < right.size()) list.set(k++, right.get(j++));
+  if (total == 0) return;
+  float angle = 0;
+  int cx = 650, cy = 350, r = 100;
+  colorMode(HSB);
+  int index = 0;
+  for (String cat : categoryTotals.keySet()) {
+    float amt = categoryTotals.get(cat);
+    float a = map(amt, 0, total, 0, TWO_PI);
+    fill(map(index, 0, categoryTotals.size(), 0, 255), 200, 200);
+    arc(cx, cy, r*2, r*2, angle, angle + a, PIE);
+    angle += a;
+    index++;
+  }
+  colorMode(RGB);
+  fill(0);
+  text("Expense Breakdown", 590, 480);
 }
