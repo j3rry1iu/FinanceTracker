@@ -1,5 +1,3 @@
-// === Transaction.pde ===
-
 class Transaction {
   String category;
   float amount;
@@ -15,13 +13,5 @@ class Transaction {
     return category + ": " + (isIncome ? "+$" : "-$") + nf(amount, 0, 2);
   }
 
-  String toFileString() {
-    return category + "," + amount + "," + isIncome;
-  }
 
-  static Transaction fromFileString(String line) {
-    String[] parts = split(line, ",");
-    if (parts.length != 3) return null;
-    return new Transaction(parts[0], float(parts[1]), Boolean.parseBoolean(parts[2]));
-  }
 }
